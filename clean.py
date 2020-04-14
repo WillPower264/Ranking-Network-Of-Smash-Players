@@ -16,8 +16,8 @@ def isValid(line):
 
 # save players and their ids
 def savePlayers(line):
-    winner_id = line[field_indices['winner_global_id']]
-    loser_id = line[field_indices['loser_global_id']]
+    winner_id = int(line[field_indices['winner_global_id']])
+    loser_id = int(line[field_indices['loser_global_id']])
     winner_name = line[field_indices['winner_name']]
     loser_name = line[field_indices['loser_name']]
     
@@ -61,7 +61,7 @@ with open('ultimate_player_ids.csv', mode='w') as player_ids:
     # write header to file
     writer = csv.DictWriter(player_ids, fieldnames=['id', 'player'])
     writer.writeheader()
-    for player_id in  players.keys():
+    for player_id in sorted(players.keys()):
         obj = {'id': player_id, 'player': ' [or] '.join(players[player_id])}
         writer.writerow(obj)
 
