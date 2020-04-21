@@ -1,6 +1,12 @@
+# clean.py - Parses the data set and outputs 3 files
+# - clean.csv: player ids and set scores
+# - player_ids.csv: player names and ids
+# - tournament_attendance.csv: tournament names and # players
+
 import csv
 
-desired_fields = ['winner_global_id', 'loser_global_id', 'winner_score', 'loser_score']
+desired_fields = ['winner_global_id', 'loser_global_id',
+                  'winner_score', 'loser_score']
 extra_fields = ['winner_name', 'loser_name', 'tournament_name']
 field_indices = {}
 players = {}
@@ -8,6 +14,7 @@ tournaments = {}
 
 # check if entry has valid data
 def isValid(line):
+    # check all validation rules
     if line[field_indices['winner_global_id']] == '0': return False
     if line[field_indices['loser_global_id']] == '0': return False
     if line[field_indices['loser_score']] == '-1': return False
@@ -18,6 +25,7 @@ def isValid(line):
 
 # save players and their ids
 def savePlayers(line):
+    # retrieve values
     winner_id = int(line[field_indices['winner_global_id']])
     loser_id = int(line[field_indices['loser_global_id']])
     winner_name = line[field_indices['winner_name']]
@@ -56,9 +64,7 @@ with open('ultimate_sets.csv') as sets_data:
         data_reader = csv.reader(sets_data)
         headers = data_reader.next()
         for i, header in enumerate(headers):
-            if header in desired_fields:
-                field_indices[header] = i
-            if header in extra_fields:
+            if header in desired_fields or header in extra_fields:
                 field_indices[header] = i
 
         # write header to file
@@ -74,17 +80,21 @@ with open('ultimate_sets.csv') as sets_data:
 
 # write player and id information
 with open('ultimate_player_ids.csv', mode='w') as player_ids:
-    # write header to file
     writer = csv.DictWriter(player_ids, fieldnames=['id', 'player'])
     writer.writeheader()
     for player_id in sorted(players.keys()):
-        writer.writerow({'id': player_id, 'player': ' [or] '.join(players[player_id])})
+        writer.writerow({
+            'id': player_id,
+            'player': ' [or] '.join(players[player_id])
+        })
 
 # write tournament name and attendance
-with open('ultimate_tournament_attendance.csv', mode='w') as tounrament_attendance:
-    # write header to file
-    writer = csv.DictWriter(tounrament_attendance, fieldnames=['tournament', 'count'])
+with open('ultimate_tournament_attendance.csv', mode='w') as attendance:
+    writer = csv.DictWriter(attendance, fieldnames=['tournament', 'count'])
     writer.writeheader()
     for tournament in sorted(tournaments.keys()):
-        writer.writerow({'tournament': tournament, 'count': tournaments[tournament]})
+        writer.writerow({
+            'tournament': tournament,
+            'count': tournaments[tournament]
+        })
 
