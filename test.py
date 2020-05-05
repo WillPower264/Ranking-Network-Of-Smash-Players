@@ -1,6 +1,8 @@
 # test.py - test script for pageranker.py
 
-from pageranker.py import PageRanker
+from pageranker import PageRanker
+import networkx as nx
+import sys
 
 ranker = PageRanker('ultimate_sets_clean.csv',
                     'ultimate_player_ids.csv')
