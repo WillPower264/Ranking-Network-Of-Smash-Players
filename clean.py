@@ -6,13 +6,13 @@
 import csv
 
 desired_fields = ['winner_global_id', 'loser_global_id',
-                  'winner_score', 'loser_score']
+                  'winner_score', 'loser_score', 'startDate']
 extra_fields = ['winner_name', 'loser_name', 'tournament_name']
 field_indices = {}
 players = {}
 tournaments = {}
 
-includeForfeits = False
+includeForfeits = True
 
 # check if entry has valid data
 def isValid(line):
