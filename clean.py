@@ -12,15 +12,18 @@ field_indices = {}
 players = {}
 tournaments = {}
 
+includeForfeits = False
+
 # check if entry has valid data
 def isValid(line):
     # check all validation rules
     if line[field_indices['winner_global_id']] == '0': return False
     if line[field_indices['loser_global_id']] == '0': return False
-    if line[field_indices['loser_score']] == '-1': return False
-    if line[field_indices['loser_score']] == '': return False
-    if line[field_indices['winner_score']] == '0': return False
-    if line[field_indices['winner_score']] == '': return False
+    if not includeForfeits:
+        if line[field_indices['loser_score']] == '-1': return False
+        if line[field_indices['loser_score']] == '': return False
+        if line[field_indices['winner_score']] == '0': return False
+        if line[field_indices['winner_score']] == '': return False
     return True
 
 # save players and their ids
@@ -59,7 +62,8 @@ def getInfo(line):
     
 # read the data from file
 with open('ultimate_sets.csv') as sets_data:
-    with open('ultimate_sets_clean.csv', mode='w') as cleaned:
+    outFile = 'ultimate_sets_clean_with_forfeits.csv' if includeForfeits else 'ultimate_sets_clean.csv'
+    with open(outFile, mode='w') as cleaned:
         # find where desired fields are in file
         data_reader = csv.reader(sets_data)
         headers = data_reader.next()
@@ -74,12 +78,18 @@ with open('ultimate_sets.csv') as sets_data:
         # process each line
         for line in data_reader:
             if not isValid(line): continue
+            if includeForfeits:
+                if line[field_indices['loser_score']] == '-1' or line[field_indices['loser_score']] == '':
+                    line[field_indices['loser_score']] = '0'
+                if line[field_indices['winner_score']] == '0' or line[field_indices['winner_score']] == '':
+                    line[field_indices['winner_score']] = '1'
             savePlayers(line)
             saveTournament(line)
             writer.writerow(getInfo(line))
 
 # write player and id information
-with open('ultimate_player_ids.csv', mode='w') as player_ids:
+outFile = 'ultimate_player_ids_with_forfeits.csv' if includeForfeits else 'ultimate_player_ids.csv'
+with open(outFile, mode='w') as player_ids:
     writer = csv.DictWriter(player_ids, fieldnames=['id', 'player'])
     writer.writeheader()
     for player_id in sorted(players.keys()):
@@ -89,7 +99,8 @@ with open('ultimate_player_ids.csv', mode='w') as player_ids:
         })
 
 # write tournament name and attendance
-with open('ultimate_tournament_attendance.csv', mode='w') as attendance:
+outFile = 'ultimate_tournament_attendance_with_forfeits.csv' if includeForfeits else 'ultimate_tournament_attendance.csv'
+with open(outFile, mode='w') as attendance:
     writer = csv.DictWriter(attendance, fieldnames=['tournament', 'count'])
     writer.writeheader()
     for tournament in sorted(tournaments.keys()):
