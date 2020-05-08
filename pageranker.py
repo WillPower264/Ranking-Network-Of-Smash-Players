@@ -9,26 +9,30 @@ import csv
 class PageRanker:
     games = ""
     names = ""
+    time = 0
     
-    def __init__(self, games, names):
+    def __init__(self, games, names, time):
         self.games = pd.read_csv(games) # 4 column cleaned data
         self.names = pd.read_csv(names) # 2 column cleaned data
+        self.time = time
         
     def build_edgelist(self):
-        data2 = self.games[['winner_global_id', 'loser_global_id']] # data with only IDs
+        data2 = self.games[['winner_global_id', 'loser_global_id', 'startDate']] # data with only IDs
         edgelist = []
         for i in range(0, len(data2)):
-            edgelist.append((str(data2['winner_global_id'][i]), str(data2['loser_global_id'][i])))
+            if data2['startDate'][i] >= self.time:
+                edgelist.append((str(data2['winner_global_id'][i]), str(data2['loser_global_id'][i])))
         return edgelist
     
     def build_edgelist_weighted(self):
         data2 = self.games[['winner_global_id', 'loser_global_id', 'winner_score', 'loser_score']]
         edgelist = []
         for i in range(0, len(data2)):
-            for j in range(0, data2['winner_score'][i]):
-                edgelist.append((str(data2['winner_global_id'][i]), str(data2['loser_global_id'][i])))
-            for j in range(0, data2['loser_score'][i]):
-                edgelist.append((str(data2['loser_global_id'][i]), str(data2['winner_global_id'][i])))
+            if data2['startDate'][i] >= self.time:
+                for j in range(0, data2['winner_score'][i]):
+                    edgelist.append((str(data2['winner_global_id'][i]), str(data2['loser_global_id'][i])))
+                for j in range(0, data2['loser_score'][i]):
+                    edgelist.append((str(data2['loser_global_id'][i]), str(data2['winner_global_id'][i])))
         return edgelist
         
     def build_digraph(self, edgelist):
