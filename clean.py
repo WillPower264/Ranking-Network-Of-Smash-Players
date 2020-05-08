@@ -6,7 +6,7 @@
 import csv
 
 desired_fields = ['winner_global_id', 'loser_global_id',
-                  'winner_score', 'loser_score', 'startDate']
+                  'winner_score', 'loser_score', 'endDate']
 extra_fields = ['winner_name', 'loser_name', 'tournament_name']
 field_indices = {}
 players = {}
