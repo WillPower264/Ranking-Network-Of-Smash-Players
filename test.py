@@ -8,7 +8,7 @@ startDate = 0
 endDate = float("inf")
 weighted = False
 
-ranker = PageRanker('ultimate_sets_clean_with_dates.csv',
+ranker = PageRanker('ultimate_sets_clean.csv',
                     'ultimate_player_ids.csv', startDate, endDate, False)
 
 el = ranker.build_edgelist()
