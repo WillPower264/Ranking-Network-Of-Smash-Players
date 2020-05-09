@@ -25,17 +25,17 @@ class PageRanker:
     def build_edgelist(self):
         edgelist = []
         if self.weighted:
-            data2 = self.games[['winner_global_id', 'loser_global_id', 'startDate', 'winner_score', 'loser_score']]
+            data2 = self.games[['winner_global_id', 'loser_global_id', 'endDate', 'winner_score', 'loser_score']]
             for i in range(0, len(data2)):
-                if data2['startDate'][i] >= self.startDate and data2['startDate'][i] <= self.endDate:
+                if data2['endDate'][i] >= self.startDate and data2['endDate'][i] <= self.endDate:
                     for j in range(0, data2['winner_score'][i]):
                         edgelist.append((str(data2['winner_global_id'][i]), str(data2['loser_global_id'][i])))
                     for j in range(0, data2['loser_score'][i]):
                         edgelist.append((str(data2['loser_global_id'][i]), str(data2['winner_global_id'][i])))
         else:
-            data2 = self.games[['winner_global_id', 'loser_global_id', 'startDate']] # data with only IDs
+            data2 = self.games[['winner_global_id', 'loser_global_id', 'endDate']] # data with only IDs
             for i in range(0, len(data2)):
-                if data2['startDate'][i] >= self.startDate and data2['startDate'][i] <= self.endDate:
+                if data2['endDate'][i] >= self.startDate and data2['endDate'][i] <= self.endDate:
                     edgelist.append((str(data2['winner_global_id'][i]), str(data2['loser_global_id'][i])))
             
         return edgelist
