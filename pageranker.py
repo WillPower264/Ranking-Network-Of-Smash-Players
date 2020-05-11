@@ -37,7 +37,7 @@ class PageRanker:
             data2 = self.games[['winner_global_id', 'loser_global_id', 'endDate']] # data with only IDs
             for i in range(0, len(data2)):
                 if data2['endDate'][i] >= self.startDate and data2['endDate'][i] <= self.endDate:
-                    edgelist.append((str(data2['winner_global_id'][i]), str(data2['loser_global_id'][i])))
+                    edgelist.append((str(data2['winner_global_id'][i]), str(data2['loser_global_id'][i]), 1))
             
         return edgelist
 
@@ -45,10 +45,16 @@ class PageRanker:
         g = nx.DiGraph()
         if self.weighted:
             for row in edgelist:
-                g.add_edge(str(row[1]), str(row[0]), weight=row[2])
+                if g.has_edge(str(row[1]), str(row[0])):
+                    g[str(row[1])][str(row[0])]['weight'] = g[str(row[1])][str(row[0])]['weight'] + row[2]
+                else:
+                    g.add_edge(str(row[1]), str(row[0]), weight=row[2])
         else:
             for row in edgelist:
-                g.add_edge(str(row[1]), str(row[0]))
+                if g.has_edge(str(row[1]), str(row[0])):
+                    g[str(row[1])][str(row[0])]['weight'] = g[str(row[1])][str(row[0])]['weight'] + 1
+                else:
+                    g.add_edge(str(row[1]), str(row[0]), weight=1)
         return g
     
     def pagerank(self, g):
