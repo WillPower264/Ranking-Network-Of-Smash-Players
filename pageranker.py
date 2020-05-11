@@ -22,16 +22,17 @@ class PageRanker:
         self.endDate = endDate
         self.weighted = weighted
         
+    # builds a list of edges to be added to the graph. If weighted = True, then edge also contains a weight attribute.
     def build_edgelist(self):
         edgelist = []
         if self.weighted:
             data2 = self.games[['winner_global_id', 'loser_global_id', 'endDate', 'winner_score', 'loser_score']]
             for i in range(0, len(data2)):
                 if data2['endDate'][i] >= self.startDate and data2['endDate'][i] <= self.endDate:
-                    for j in range(0, data2['winner_score'][i]):
-                        edgelist.append((str(data2['winner_global_id'][i]), str(data2['loser_global_id'][i])))
-                    for j in range(0, data2['loser_score'][i]):
-                        edgelist.append((str(data2['loser_global_id'][i]), str(data2['winner_global_id'][i])))
+                    edgelist.append((str(data2['winner_global_id'][i]), 
+                                     str(data2['loser_global_id'][i]), data2['winner_score'][i]))
+                    edgelist.append((str(data2['loser_global_id'][i]),
+                                     str(data2['winner_global_id'][i]), data2['loser_score'][i]))
         else:
             data2 = self.games[['winner_global_id', 'loser_global_id', 'endDate']] # data with only IDs
             for i in range(0, len(data2)):
@@ -42,8 +43,12 @@ class PageRanker:
 
     def build_digraph(self, edgelist):
         g = nx.DiGraph()
-        for row in edgelist:
-            g.add_edge(str(row[1]), str(row[0]))
+        if self.weighted:
+            for row in edgelist:
+                g.add_edge(str(row[1]), str(row[0]), weight=row[2])
+        else:
+            for row in edgelist:
+                g.add_edge(str(row[1]), str(row[0]))
         return g
     
     def pagerank(self, g):
@@ -64,6 +69,7 @@ class PageRanker:
         except ValueError:
             return -1
         
+    # If there are multiple players with the username, is not guaranteed to return the ID of the correct player.
     def name2id(self, name):
         try:
             return self.names['id'][list(self.names['player'][0:]).index(name)]
